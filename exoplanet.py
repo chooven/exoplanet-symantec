@@ -49,7 +49,7 @@ for p in planets:
 
 
 print "Orphan planet count: %s" % orphanCnt
-print "Planet orbiting Hottest Star is %s " % hottestStartPlanet
+print "Planet orbiting Hottest Star: %s " % hottestStartPlanet
 for k in sorted(sizeByYear.keys()):
     if(k == ""):
         print "%s small planets, %s medium planets, %s large planets, and %s unknown size had no year of discovery" % (
