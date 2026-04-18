@@ -1,5 +1,5 @@
 
-class Counts(object):
+class Counts:
     small_count = 0
     medium_count = 0
     large_count = 0

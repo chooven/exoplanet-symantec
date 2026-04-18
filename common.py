@@ -20,11 +20,11 @@ def is_orphan(planet):
     return False
 
 
-def has_hotterStar(planet, hottestStarTemp):
-    hottest = dict()
+def has_hotter_star(planet, hottest_star_temp):
+    hottest = {}
     try:
-        hostTemp = int(planet['HostStarTempK'])
-        if(hostTemp > hottestStarTemp):
+        host_temp = int(planet['HostStarTempK'])
+        if host_temp > hottest_star_temp:
             hottest['HostStarTempK'] = planet['HostStarTempK']
             hottest["PlanetIdentifier"] = planet['PlanetIdentifier']
     except (ValueError, KeyError):
@@ -35,10 +35,12 @@ def has_hotterStar(planet, hottestStarTemp):
 
 def get_planet_size(planet):
     size = 0.0
-    try:
-        if(planet['RadiusJpt'] >= 0):
-            size = float(planet['RadiusJpt'])
 
-    except(ValueError, KeyError):
+    try:
+        radius = float(planet['RadiusJpt'])
+        if radius >= 0:
+            size = radius
+
+    except (ValueError, KeyError, TypeError):
         pass
     return size

@@ -1,59 +1,56 @@
 import json
 from models import Counts
-from common import data_request, is_orphan, has_hotterStar, get_planet_size
+from common import data_request, is_orphan, has_hotter_star, get_planet_size
 from constants import PLANET_SIZE
 
 
-orphanCnt = 0
-hottestStarTemp = 0
-StarTempUnknown = 0
-hottestStarPlanet = ""
-sizeByYear = {}
+orphan_cnt = 0
+hottest_star_temp = 0
+star_temp_unknown = 0
+hottest_star_planet = ""
+size_by_year = {}
 
 try:
     data = data_request()
-    if(len(data) > 0):
+    if len(data) > 0:
         planets = json.loads(data)
 except (ValueError, KeyError, TypeError):
-    print "JSON format error"
+    print("JSON format error")
 
-print "Total planets: %s" % len(planets)
+print(f"Total planets: {len(planets)}")
 for p in planets:
-    if(is_orphan(p)):
-        orphanCnt += 1
+    if is_orphan(p):
+        orphan_cnt += 1
 
-    hotter = has_hotterStar(p, hottestStarTemp)
+    hotter = has_hotter_star(p, hottest_star_temp)
     if 'HostStarTempK' in hotter:
-        hottestStartPlanet = hotter['PlanetIdentifier']
-        hottestStarTemp = hotter['HostStarTempK']
+        hottest_star_planet = hotter['PlanetIdentifier']
+        hottest_star_temp = hotter['HostStarTempK']
 
     try:
         year = p['DiscoveryYear']
-        if(sizeByYear.has_key(year)):
-            counts = sizeByYear[year]
+        if year in size_by_year:
+            counts = size_by_year[year]
         else:
             counts = Counts(year)
-        planetSize = get_planet_size(p)
-        if(planetSize == 0):
+        planet_size = get_planet_size(p)
+        if planet_size == 0:
             counts.unknown_count += 1
-        elif(planetSize < PLANET_SIZE["SMALL"]):
+        elif planet_size < PLANET_SIZE["SMALL"]:
             counts.small_count += 1
-        elif(planetSize < PLANET_SIZE["MEDIUM"]):
+        elif planet_size < PLANET_SIZE["MEDIUM"]:
             counts.medium_count += 1
         else:
             counts.large_count += 1
-        sizeByYear.update({year: counts})
+        size_by_year.update({year: counts})
     except (ValueError, KeyError):
-        print "Unknown planet size %s  data: %s" % (year, p['RadiusJpt'])
-        pass
+        print(f"Unknown planet size {year}  data: {p['RadiusJpt']}")
 
 
-print "Orphan planet count: %s" % orphanCnt
-print "Planet orbiting Hottest Star: %s " % hottestStartPlanet
-for k in sorted(sizeByYear.keys()):
-    if(k == ""):
-        print "%s small planets, %s medium planets, %s large planets, and %s unknown size had no year of discovery" % (
-            sizeByYear[k].small_count, sizeByYear[k].medium_count, sizeByYear[k].large_count, sizeByYear[k].unknown_count)
+print(f"Orphan planet count: {orphan_cnt}")
+print(f"Planet orbiting Hottest Star: {hottest_star_planet}")
+for k in sorted(size_by_year.keys(), key=lambda x: (x == "", x if x != "" else 0)):
+    if k == "":
+        print(f"{size_by_year[k].small_count} small planets, {size_by_year[k].medium_count} medium planets, {size_by_year[k].large_count} large planets, and {size_by_year[k].unknown_count} unknown size had no year of discovery")
     else:
-        print "in %s we discoverd %s small planets, %s medium planets, %s large planets, and %s unknown size:" % (
-            k, sizeByYear[k].small_count, sizeByYear[k].medium_count, sizeByYear[k].large_count, sizeByYear[k].unknown_count)
+        print(f"in {k} we discoverd {size_by_year[k].small_count} small planets, {size_by_year[k].medium_count} medium planets, {size_by_year[k].large_count} large planets, and {size_by_year[k].unknown_count} unknown size:")
